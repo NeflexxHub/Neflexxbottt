@@ -11,3 +11,26 @@
 /dist
 test.py
 backup.zip
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Replit
+.pythonlibs/
+.config/
+.cache/
+.upm/
+replit.nix
+.replit
