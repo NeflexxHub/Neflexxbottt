@@ -29,18 +29,19 @@ def run():
     app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 
 def self_ping():
-    """Пингует приложение каждые 3 минуты для предотвращения засыпания"""
+    """Пингует приложение каждые 2 минуты для предотвращения засыпания (DevSpen метод)"""
     time.sleep(10)
     
     replit_url = os.getenv('REPLIT_URL') or 'http://localhost:5000'
     
     while True:
         try:
-            time.sleep(180)
-            requests.get(f"{replit_url}/ping", timeout=5)
-            print("[Self-Ping] ✓ Приложение пингировано")
+            time.sleep(120)  # Пинг каждые 2 минуты
+            response = requests.get(f"{replit_url}/ping", timeout=5)
+            if response.status_code == 200:
+                print("[Self-Ping] ✓ Пинг выполнен (120 сек)")
         except Exception as e:
-            print(f"[Self-Ping] ✗ Ошибка при пинге: {e}")
+            print(f"[Self-Ping] ✗ Ошибка: {e}")
 
 def keep_alive():
     server_thread = Thread(target=run, daemon=True)
