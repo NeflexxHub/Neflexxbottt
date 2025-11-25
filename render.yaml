@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: funpay-cardinal-bot
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python restart_bot.py"
+    envVars:
+      - key: SESSION_SECRET
+        scope: run
+        sync: false
+    autoDeploy: true
+    repo: https://github.com/sidor0912/FunPayCardinal.git
+    branch: main
