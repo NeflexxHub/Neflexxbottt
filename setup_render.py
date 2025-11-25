@@ -99,11 +99,21 @@ language : ru
 """
         
         os.makedirs("configs", exist_ok=True)
+        os.makedirs("storage/cache", exist_ok=True)
         
         with open("configs/_main.cfg", "w", encoding="utf-8") as f:
             f.write(config_content)
         
+        # Добавляем админ ID в авторизованных пользователей
+        import json
+        auth_users_file = "storage/cache/tg_authorized_users.json"
+        authorized_users = {tg_admin_id: {}}
+        
+        with open(auth_users_file, "w", encoding="utf-8") as f:
+            json.dump(authorized_users, f, indent=2)
+        
         print("[OK] ✅ Конфиг создан: configs/_main.cfg")
+        print(f"[OK] ✅ Авторизированный пользователь добавлен: {tg_admin_id}")
         return True
         
     except Exception as e:
