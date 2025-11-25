@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "bash -c 'python setup_render.py && python restart_bot.py'"
+    startCommand: "bash -c 'python setup_render.py && python main.py'"
     envVars:
       - key: SESSION_SECRET
         scope: run
