@@ -111,7 +111,7 @@ def create_config_obj(settings) -> ConfigParser:
     :return: объект конфига.
     """
     config = ConfigParser(delimiters=(":",), interpolation=None)
-    config.optionxform = str
+    config.optionxform = lambda optionstr: optionstr
     config.read_dict(settings)
     return config
 
