@@ -96,8 +96,14 @@ print(f"{Fore.MAGENTA}{Style.BRIGHT} * Донат: {Fore.BLUE}{Style.BRIGHT}t.me
 print(f"{Fore.MAGENTA}{Style.BRIGHT} * Telegram-чат: {Fore.BLUE}{Style.BRIGHT}t.me/funpay_cardinal")
 
 if not os.path.exists("configs/_main.cfg"):
-    first_setup()
-    sys.exit()
+    try:
+        first_setup()
+        sys.exit()
+    except EOFError:
+        # Non-interactive environment (like Render) - skip setup if config doesn't exist
+        logger.error("Не удалось запустить интерактивную настройку в non-interactive среде!")
+        logger.error("Пожалуйста, создайте файл configs/_main.cfg с необходимыми параметрами.")
+        sys.exit(1)
 
 if sys.platform == "linux" and os.getenv('FPC_IS_RUNNIG_AS_SERVICE', '0') == '1':
     import getpass
