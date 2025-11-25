@@ -133,6 +133,16 @@ if __name__ == "__main__":
         else:
             print("[INFO] Конфиг уже существует")
         
+        # Синхронизируем изменения с GitHub
+        print("[INFO] Синхронизирую изменения с GitHub...")
+        try:
+            from auto_sync_git import auto_sync
+            auto_sync()
+        except ImportError:
+            print("[INFO] ⚠️ auto_sync_git.py не найден, пропускаю синхронизацию")
+        except Exception as e:
+            print(f"[INFO] ⚠️ Ошибка синхронизации: {e}")
+        
         print("[INFO] ✅ Инициализация завершена, запускаю main.py...")
         sys.exit(0)  # Успешное завершение
         
