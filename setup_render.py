@@ -1,22 +1,30 @@
 #!/usr/bin/env python3
 """
-Скрипт инициализации конфигов на Render из переменных окружения
+Инициализация конфигов на Render из Environment Variables
 """
 
 import os
 import sys
+import traceback
 
 def create_main_config():
     """Создает configs/_main.cfg из переменных окружения"""
     
-    golden_key = os.getenv('GOLDEN_KEY', '')
-    tg_token = os.getenv('TG_TOKEN', '')
-    
-    if not golden_key or not tg_token:
-        print("[ERROR] Необходимо установить GOLDEN_KEY и TG_TOKEN в Environment Variables на Render!")
-        return False
-    
-    config_content = f"""[FunPay]
+    try:
+        golden_key = os.getenv('GOLDEN_KEY', '').strip()
+        tg_token = os.getenv('TG_TOKEN', '').strip()
+        tg_admin_id = os.getenv('TG_ADMIN_ID', '1605524094').strip()
+        
+        print(f"[DEBUG] GOLDEN_KEY exists: {bool(golden_key)}")
+        print(f"[DEBUG] TG_TOKEN exists: {bool(tg_token)}")
+        print(f"[DEBUG] TG_ADMIN_ID: {tg_admin_id}")
+        
+        if not golden_key or not tg_token:
+            print("[ERROR] ❌ GOLDEN_KEY или TG_TOKEN не установлены в Environment!")
+            print("[ERROR] ❌ Установите их на Render в Settings → Environment")
+            return False
+        
+        config_content = f"""[FunPay]
 golden_key : {golden_key}
 user_agent : Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36
 autoRaise : 1
@@ -89,18 +97,36 @@ requestsDelay : 4
 language : ru
 
 """
-    
-    os.makedirs("configs", exist_ok=True)
-    
-    with open("configs/_main.cfg", "w", encoding="utf-8") as f:
-        f.write(config_content)
-    
-    print("[OK] Конфиг configs/_main.cfg создан успешно!")
-    return True
+        
+        os.makedirs("configs", exist_ok=True)
+        
+        with open("configs/_main.cfg", "w", encoding="utf-8") as f:
+            f.write(config_content)
+        
+        print("[OK] ✅ Конфиг создан: configs/_main.cfg")
+        return True
+        
+    except Exception as e:
+        print(f"[ERROR] ❌ Ошибка при создании конфига: {e}")
+        traceback.print_exc()
+        return False
 
 if __name__ == "__main__":
-    if not os.path.exists("configs/_main.cfg"):
-        if not create_main_config():
-            sys.exit(1)
-    else:
-        print("[INFO] configs/_main.cfg уже существует")
+    print("[INFO] Инициализация Render deployment...")
+    
+    try:
+        if not os.path.exists("configs/_main.cfg"):
+            print("[INFO] Конфиг не найден, создаём...")
+            if not create_main_config():
+                print("[ERROR] Не удалось создать конфиг!")
+                sys.exit(1)
+        else:
+            print("[INFO] Конфиг уже существует")
+        
+        print("[INFO] ✅ Инициализация завершена, запускаю main.py...")
+        sys.exit(0)  # Успешное завершение
+        
+    except Exception as e:
+        print(f"[ERROR] Критическая ошибка: {e}")
+        traceback.print_exc()
+        sys.exit(1)
