@@ -96,14 +96,99 @@ print(f"{Fore.MAGENTA}{Style.BRIGHT} * Донат: {Fore.BLUE}{Style.BRIGHT}t.me
 print(f"{Fore.MAGENTA}{Style.BRIGHT} * Telegram-чат: {Fore.BLUE}{Style.BRIGHT}t.me/funpay_cardinal")
 
 if not os.path.exists("configs/_main.cfg"):
-    try:
-        first_setup()
-        sys.exit()
-    except EOFError:
-        # Non-interactive environment (like Render) - skip setup if config doesn't exist
-        logger.error("Не удалось запустить интерактивную настройку в non-interactive среде!")
-        logger.error("Пожалуйста, создайте файл configs/_main.cfg с необходимыми параметрами.")
-        sys.exit(1)
+    # Проверяем environment variables
+    golden_key = os.getenv('GOLDEN_KEY', '').strip()
+    tg_token = os.getenv('TG_TOKEN', '').strip()
+    
+    if golden_key and tg_token:
+        # Создаем конфиг из environment variables (для Render)
+        from configparser import ConfigParser
+        config = ConfigParser()
+        config['FunPay'] = {
+            'golden_key': golden_key,
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+            'autoRaise': '1',
+            'autoResponse': '0',
+            'autoDelivery': '1',
+            'multiDelivery': '0',
+            'autoRestore': '1',
+            'autoDisable': '0',
+            'oldMsgGetMode': '0',
+            'locale': 'ru',
+            'keepSentMessagesUnread': '0'
+        }
+        config['Telegram'] = {
+            'enabled': '1',
+            'token': tg_token,
+            'secretKeyHash': '$2b$12$omj93ERSTcF4Jcc3vuWspObyV.P86oOvXCyLwaNKcPSi6GOi1zi.q',
+            'blockLogin': '1'
+        }
+        config['BlockList'] = {
+            'blockDelivery': '0',
+            'blockResponse': '0',
+            'blockNewMessageNotification': '0',
+            'blockNewOrderNotification': '0',
+            'blockCommandNotification': '0'
+        }
+        config['NewMessageView'] = {
+            'includeMyMessages': '1',
+            'includeFPMessages': '1',
+            'includeBotMessages': '0',
+            'notifyOnlyMyMessages': '0',
+            'notifyOnlyFPMessages': '0',
+            'notifyOnlyBotMessages': '0',
+            'showImageName': '1'
+        }
+        config['Greetings'] = {
+            'ignoreSystemMessages': '0',
+            'onlyNewChats': '0',
+            'sendGreetings': '0',
+            'greetingsText': 'Привет, $chat_name!',
+            'greetingsCooldown': '2'
+        }
+        config['OrderConfirm'] = {
+            'watermark': '1',
+            'sendReply': '1',
+            'replyText': '$username, спасибо за подтверждение заказа $order_id! Если не сложно, оставь, пожалуйста, отзыв!'
+        }
+        config['ReviewReply'] = {
+            'star1Reply': '0',
+            'star2Reply': '0',
+            'star3Reply': '0',
+            'star4Reply': '0',
+            'star5Reply': '1',
+            'star1ReplyText': '',
+            'star2ReplyText': '',
+            'star3ReplyText': '',
+            'star4ReplyText': '',
+            'star5ReplyText': ''
+        }
+        config['Proxy'] = {
+            'enable': '0',
+            'ip': '',
+            'port': '',
+            'login': '',
+            'password': '',
+            'check': '0'
+        }
+        config['Other'] = {
+            'watermark': '🐦',
+            'requestsDelay': '4',
+            'language': 'ru'
+        }
+        
+        with open("configs/_main.cfg", "w", encoding="utf-8") as f:
+            config.write(f)
+        logger.info("✅ Конфиг создан из environment variables (Render)")
+    else:
+        try:
+            first_setup()
+            sys.exit()
+        except EOFError:
+            # Non-interactive environment (like Render) - skip setup if config doesn't exist
+            logger.error("❌ Не удалось запустить интерактивную настройку в non-interactive среде!")
+            logger.error("❌ Установите environment variables: GOLDEN_KEY, TG_TOKEN")
+            sys.exit(1)
 
 if sys.platform == "linux" and os.getenv('FPC_IS_RUNNIG_AS_SERVICE', '0') == '1':
     import getpass
