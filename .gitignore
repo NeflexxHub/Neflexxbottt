@@ -4,7 +4,7 @@
 /.idea
 /FunPayAPI/__pycache__
 /logs
-/storage
+/storage/cache
 /configs
 /plugins/__pycache__
 /build
