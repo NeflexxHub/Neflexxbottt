@@ -1,0 +1,5 @@
+aiogram==3.0.0b7
+aiohttp==3.8.5
+SQLAlchemy==1.4.52
+aiosqlite==0.18.0
+tenacity==8.2.2
