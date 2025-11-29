@@ -5,7 +5,7 @@
 /FunPayAPI/__pycache__
 /logs
 /storage/cache
-# Исключаем кеши конфигов, но включаем сами конфиги
+/configs
 /plugins/__pycache__
 /build
 /dist
