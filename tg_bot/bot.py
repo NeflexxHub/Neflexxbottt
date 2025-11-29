@@ -289,8 +289,23 @@ class TGBot:
         lang = m.from_user.language_code
         if m.chat.type != "private" or (self.attempts.get(m.from_user.id, 0) >= 5) or m.text is None:
             return
-        if not self.cardinal.block_tg_login and \
-                cardinal_tools.check_password(m.text, self.cardinal.MAIN_CFG["Telegram"]["secretKeyHash"]):
+        
+        # Если blockLogin: 1, то разрешаем доступ по Telegram ID (без пароля)
+        if self.cardinal.block_tg_login:
+            self.send_notification(text=_("access_granted_notification", m.from_user.username, m.from_user.id),
+                                   notification_type=NotificationTypes.critical, pin=True)
+            self.authorized_users[m.from_user.id] = {}
+            utils.save_authorized_users(self.authorized_users)
+            if str(m.chat.id) not in self.notification_settings or not self.is_notification_enabled(m.chat.id,
+                                                                                                    NotificationTypes.critical):
+                self.notification_settings[str(m.chat.id)] = self.__default_notification_settings.copy()
+                self.notification_settings[str(m.chat.id)][NotificationTypes.critical] = 1
+                utils.save_notification_settings(self.notification_settings)
+            text = _("access_granted", language=lang)
+            kb_links = None
+            logger.warning(_("log_access_granted", m.from_user.username, m.from_user.id))
+        # Если blockLogin: 0, то требуется пароль
+        elif cardinal_tools.check_password(m.text, self.cardinal.MAIN_CFG["Telegram"]["secretKeyHash"]):
             self.send_notification(text=_("access_granted_notification", m.from_user.username, m.from_user.id),
                                    notification_type=NotificationTypes.critical, pin=True)
             self.authorized_users[m.from_user.id] = {}
