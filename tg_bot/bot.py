@@ -289,8 +289,9 @@ class TGBot:
         lang = m.from_user.language_code
         if m.chat.type != "private" or (self.attempts.get(m.from_user.id, 0) >= 5) or m.text is None:
             return
-        if not self.cardinal.block_tg_login and \
-                cardinal_tools.check_password(m.text, self.cardinal.MAIN_CFG["Telegram"]["secretKeyHash"]):
+        # Если blockLogin: 1, то разрешаем доступ без пароля. Если blockLogin: 0, то требуем пароль
+        if self.cardinal.block_tg_login or \
+                (not self.cardinal.block_tg_login and cardinal_tools.check_password(m.text, self.cardinal.MAIN_CFG["Telegram"]["secretKeyHash"])):
             self.send_notification(text=_("access_granted_notification", m.from_user.username, m.from_user.id),
                                    notification_type=NotificationTypes.critical, pin=True)
             self.authorized_users[m.from_user.id] = {}

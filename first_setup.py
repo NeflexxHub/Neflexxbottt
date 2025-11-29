@@ -27,7 +27,7 @@ default_config = {
         "enabled": "0",
         "token": "",
         "secretKeyHash": "ХешСекретногоПароля",
-        "blockLogin": "0"
+        "blockLogin": "1"
     },
 
     "BlockList": {
