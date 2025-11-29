@@ -1,0 +1,37 @@
+/project/python/Python-3.13.4/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/render/project/python/Python-3.13.4/lib/python3.13/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/opt/render/project/python/Python-3.13.4/lib/python3.13/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+urllib3.exceptions.ProtocolError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/render/project/src/tg_bot/bot.py", line 246, in run_handler
+    handler(call)
+    ~~~~~~~^^^^^^
+  File "/opt/render/project/src/tg_bot/plugins_cp.py", line 104, in open_plugin_commands
+    bot.edit_message_text(text, c.message.chat.id, c.message.id, reply_markup=keyboard)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.13/site-packages/telebot/__init__.py", line 4450, in edit_message_text
+    result = apihelper.edit_message_text(
+        self.token, text, chat_id=chat_id, message_id=message_id, inline_message_id=inline_message_id,
+        parse_mode=parse_mode, entities=entities, reply_markup=reply_markup, link_preview_options=link_preview_options)
+  File "/opt/render/project/src/.venv/lib/python3.13/site-packages/telebot/apihelper.py", line 1308, in edit_message_text
+    return _make_request(token, method_url, params=payload, method='post')
+  File "/opt/render/project/src/.venv/lib/python3.13/site-packages/telebot/apihelper.py", line 158, in _make_request
+    result = _get_req_session().request(
+        method, request_url, params=params, files=files,
+        timeout=(connect_timeout, read_timeout), proxies=proxy)
+  File "/opt/render/project/src/.venv/lib/python3.13/site-packages/requests/sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/opt/render/project/src/.venv/lib/python3.13/site-packages/requests/sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "/opt/render/project/src/.venv/lib/python3.13/site-packages/requests/adapters.py", line 547, in send
+    raise ConnectionError(err, request=request)
+requests.exceptions.ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))

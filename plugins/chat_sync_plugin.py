@@ -149,6 +149,10 @@ class ChatSync:
 
         # {ID темы: (id эмодзи топика, заголовок топика)}
         self.threads_info = {}
+        
+        # Загружаем состояние синхронизации для предотвращения отправки старых сообщений
+        self.sync_state_file = os.path.join(PLUGIN_FOLDER, "sync_state.json")
+        self.load_sync_state()
 
         setattr(ChatSync.send_message, "plugin_uuid", UUID)
         setattr(ChatSync.ingoing_message_handler, "plugin_uuid", UUID)
@@ -163,6 +167,36 @@ class ChatSync:
     def new_thread(self, fp_chat_id: int | str, thread_id: int | str):
         self.threads[str(fp_chat_id)] = int(thread_id)
         self.__reversed_threads[int(thread_id)] = str(fp_chat_id)
+
+    def load_sync_state(self):
+        """
+        Загружает состояние синхронизации из файла.
+        """
+        try:
+            if os.path.exists(self.sync_state_file):
+                with open(self.sync_state_file, "r", encoding="utf-8") as f:
+                    state = json.loads(f.read())
+                    self.init_chat_synced = state.get("init_chat_synced", False)
+                    logger.info(f"{LOGGER_PREFIX} Загрузил состояние синхронизации: init_chat_synced={self.init_chat_synced}")
+            else:
+                self.init_chat_synced = False
+        except:
+            logger.error(f"{LOGGER_PREFIX} Ошибка при загрузке состояния синхронизации.")
+            self.init_chat_synced = False
+
+    def save_sync_state(self):
+        """
+        Сохраняет состояние синхронизации в файл.
+        """
+        try:
+            os.makedirs(PLUGIN_FOLDER, exist_ok=True)
+            state = {"init_chat_synced": self.init_chat_synced}
+            with open(self.sync_state_file, "w", encoding="utf-8") as f:
+                f.write(json.dumps(state, indent=2))
+            logger.info(f"{LOGGER_PREFIX} Сохранил состояние синхронизации: init_chat_synced={self.init_chat_synced}")
+        except:
+            logger.error(f"{LOGGER_PREFIX} Ошибка при сохранении состояния синхронизации.")
+            logger.debug("TRACEBACK", exc_info=True)
 
     def load_settings(self):
         """
@@ -699,6 +733,7 @@ class ChatSync:
         if self.init_chat_synced or not self.ready:
             return
         self.init_chat_synced = True
+        self.save_sync_state()  # Сохраняем сразу после установки флага
         Thread(target=self.sync_chat_on_start, args=(c,), daemon=True).start()
 
     # TELEGRAM
