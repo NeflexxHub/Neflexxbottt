@@ -27,7 +27,7 @@ default_config = {
         "enabled": "0",
         "token": "",
         "secretKeyHash": "ХешСекретногоПароля",
-        "blockLogin": "0"
+        "blockLogin": "1"
     },
 
     "BlockList": {
@@ -181,21 +181,10 @@ def first_setup():
             continue
         break
 
-    while True:
-        print(
-            f"\n{Fore.MAGENTA}{Style.BRIGHT}┌── {Fore.CYAN}Придумай пароль (его потребует Telegram-бот). Пароль должен содержать более 8 символов, заглавные, строчные буквы и хотя бы одну цифру "
-            f" {Fore.RED}ᴖ̮ ̮ᴖ{Style.RESET_ALL}")
-        password = input(f"{Fore.MAGENTA}{Style.BRIGHT}└───> {Style.RESET_ALL}").strip()
-        if len(password) < 8 or password.lower() == password or password.upper() == password or not any(
-                [i.isdigit() for i in password]):
-            print(
-                f"\n{Fore.CYAN}{Style.BRIGHT}Это плохой пароль. Попробуй еще раз! {Fore.RED}\(!!˚0˚)/{Style.RESET_ALL}")
-            continue
-        break
-
     config.set("Telegram", "enabled", "1")
     config.set("Telegram", "token", token)
-    config.set("Telegram", "secretKeyHash", hash_password(password))
+    config.set("Telegram", "blockLogin", "1")
+    # Пароль отключен - используется Telegram ID для доступа
 
     while True:
         print(f"\n{Fore.MAGENTA}{Style.BRIGHT}┌── {Fore.CYAN}"
