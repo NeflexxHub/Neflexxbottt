@@ -43,10 +43,11 @@ def auto_sync():
     
     print("[AUTO-SYNC] 📝 Есть изменения, коммитю...")
     
-    # Добавляем ТОЛЬКО настройки плагинов (storage/plugins/)
-    # Плагины (plugins/) загружаются один раз из Git и больше НЕ обновляются
-    print("[AUTO-SYNC] 📂 Добавляю storage/plugins/ (только настройки)...")
+    # Добавляем настройки плагинов и основные конфиги
+    print("[AUTO-SYNC] 📂 Добавляю storage/plugins/ и configs/...")
     run_git_command("git add -A storage/plugins/ 2>/dev/null || true")
+    run_git_command("git add -A configs/ 2>/dev/null || true")
+    run_git_command("git add -A *.cfg 2>/dev/null || true")  # Конфиги в корне
     run_git_command("git add -u 2>/dev/null || true")  # Добавляем удаленные файлы
     
     # Коммитим
