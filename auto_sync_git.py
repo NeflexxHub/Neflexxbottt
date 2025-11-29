@@ -43,8 +43,10 @@ def auto_sync():
     
     print("[AUTO-SYNC] 📝 Есть изменения, коммитю...")
     
-    # Добавляем изменения
-    run_git_command("git add plugins/ storage/plugins/ 2>/dev/null || true")
+    # Добавляем ВСЕ изменения в плагинах и настройках
+    print("[AUTO-SYNC] 📂 Добавляю plugins/ и storage/plugins/...")
+    run_git_command("git add -A plugins/ storage/plugins/ 2>/dev/null || true")
+    run_git_command("git add -u 2>/dev/null || true")  # Добавляем удаленные файлы
     
     # Коммитим
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
