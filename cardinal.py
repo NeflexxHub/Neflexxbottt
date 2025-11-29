@@ -455,18 +455,6 @@ class Cardinal(object):
 
         :return: объект сообщения / последнего сообщения, если оно доставлено, иначе - None
         """
-        # Убедимся что аккаунт инициализирован перед отправкой
-        try:
-            if not self.account.id:
-                self.account.get()
-        except:
-            try:
-                self.account.get()
-            except Exception as ex:
-                logger.error(_("crd_msg_send_err", chat_id))
-                logger.debug("TRACEBACK", exc_info=True)
-                return None
-        
         if self.MAIN_CFG["Other"].get("watermark") and watermark and not message_text.strip().startswith("$photo="):
             message_text = f"{self.MAIN_CFG['Other']['watermark']}\n" + message_text
 
