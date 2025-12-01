@@ -1,3 +1,5 @@
 {
-  "init_chat_synced": true
+  "last_synced_timestamp": null,
+  "synced_chats": [],
+  "last_full_sync": null
 }

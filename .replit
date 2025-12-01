@@ -16,15 +16,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Code Editor Only"
+args = "FunPay Cardinal Bot"
 
 [[workflows.workflow]]
-name = "Code Editor Only"
+name = "FunPay Cardinal Bot"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "echo \"FunPay Cardinal Bot - Code editor mode. Bot runs on Render only. Project: $(pwd)\" && sleep infinity"
+args = "python restart_bot.py"
 
 [workflows.workflow.metadata]
 outputType = "console"
