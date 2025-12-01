@@ -76,6 +76,8 @@ def plugin_settings_kb(cs: ChatSync, offset: int) -> K:
 
 def switchers_kb(cs: ChatSync, offset: int) -> K:
     kb = K()
+    kb.add(B(("🟢" if cs.settings["enabled"] else "🔴") + " Включить синхронизацию чатов",
+             callback_data=f"{CBT_SWITCH}:enabled:{offset}"))
     kb.add(B(("🟢" if cs.settings["watermark_is_hidden"] else "🔴") + " Скрывать вотермарку",
              callback_data=f"{CBT_SWITCH}:watermark_is_hidden:{offset}"))
     kb.add(B(_("mv_show_image_name", ("🟢" if cs.settings["image_name"] else "🔴")),
@@ -173,6 +175,7 @@ class ChatSync:
         Загружает настройки плагина.
         """
         self.settings = {"chat_id": None,
+                         "enabled": False,
                          "watermark_is_hidden": False,
                          "image_name": True,
                          "mono": False,
@@ -701,7 +704,7 @@ class ChatSync:
                     self.save_threads()
 
     def ingoing_message_handler(self, c: Cardinal, e: events.NewMessageEvent):
-        if not self.ready:
+        if not self.ready or not self.settings.get("enabled"):
             return
         if e.stack.id() == self.notification_last_stack_id:
             return
@@ -709,7 +712,7 @@ class ChatSync:
         Thread(target=self.ingoing_message, args=(c, e), daemon=True).start()
 
     def new_order_handler(self, c: Cardinal, e: events.NewOrderEvent):
-        if not self.ready:
+        if not self.ready or not self.settings.get("enabled"):
             return
         chat_id = c.account.get_chat_by_name(e.order.buyer_username).id
         if str(chat_id) not in self.threads:
@@ -728,7 +731,7 @@ class ChatSync:
         self.sync_chats_running = False
 
     def sync_chat_on_start_handler(self, c: Cardinal, e: events.InitialChatEvent):
-        if self.init_chat_synced or not self.ready:
+        if self.init_chat_synced or not self.ready or not self.settings.get("enabled"):
             return
         self.init_chat_synced = True
         self.save_sync_state()
