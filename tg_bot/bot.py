@@ -289,23 +289,8 @@ class TGBot:
         lang = m.from_user.language_code
         if m.chat.type != "private" or (self.attempts.get(m.from_user.id, 0) >= 5) or m.text is None:
             return
-        
-        # Если уже авторизован - не повторяем авторизацию
-        if m.from_user.id in self.authorized_users:
-            return
-        
-        # blockLogin: 1 = авторизуем БЕЗ пароля (один раз при первом сообщении)
-        # blockLogin: 0 = требуем пароль
-        is_authorized = False
-        
-        if self.cardinal.block_tg_login:
-            # При blockLogin: 1 авторизуем сразу без проверки пароля
-            is_authorized = True
-        elif m.text and cardinal_tools.check_password(m.text, self.cardinal.MAIN_CFG["Telegram"]["secretKeyHash"]):
-            # При blockLogin: 0 проверяем пароль
-            is_authorized = True
-        
-        if is_authorized:
+        if not self.cardinal.block_tg_login and \
+                cardinal_tools.check_password(m.text, self.cardinal.MAIN_CFG["Telegram"]["secretKeyHash"]):
             self.send_notification(text=_("access_granted_notification", m.from_user.username, m.from_user.id),
                                    notification_type=NotificationTypes.critical, pin=True)
             self.authorized_users[m.from_user.id] = {}
