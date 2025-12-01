@@ -731,11 +731,9 @@ class ChatSync:
         self.sync_chats_running = False
 
     def sync_chat_on_start_handler(self, c: Cardinal, e: events.InitialChatEvent):
-        if self.init_chat_synced or not self.ready or not self.settings.get("enabled"):
-            return
-        self.init_chat_synced = True
-        self.save_sync_state()
-        Thread(target=self.sync_chat_on_start, args=(c,), daemon=True).start()
+        # Начальная синхронизация отключена - чаты не будут дублироваться при перезапуске
+        # Пользователь может включить синхронизацию в меню плагина
+        return
 
     # TELEGRAM
     def no(self, c: telebot.types.CallbackQuery):
