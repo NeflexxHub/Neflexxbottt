@@ -289,6 +289,11 @@ class TGBot:
         lang = m.from_user.language_code
         if m.chat.type != "private" or (self.attempts.get(m.from_user.id, 0) >= 5) or m.text is None:
             return
+        
+        # Если уже авторизован - не повторяем авторизацию
+        if m.from_user.id in self.authorized_users:
+            return
+        
         # blockLogin: 1 = авторизуем без пароля, blockLogin: 0 = требуем пароль
         if self.cardinal.block_tg_login or \
                 cardinal_tools.check_password(m.text, self.cardinal.MAIN_CFG["Telegram"]["secretKeyHash"]):
