@@ -175,7 +175,7 @@ class ChatSync:
         Загружает настройки плагина.
         """
         self.settings = {"chat_id": None,
-                         "enabled": False,
+                         "enabled": True,
                          "watermark_is_hidden": False,
                          "image_name": True,
                          "mono": False,
