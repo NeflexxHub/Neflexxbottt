@@ -149,6 +149,10 @@ class ChatSync:
 
         # {ID темы: (id эмодзи топика, заголовок топика)}
         self.threads_info = {}
+        
+        # Состояние синхронизации - сохраняется при перезапуске
+        self.sync_state_file = os.path.join(PLUGIN_FOLDER, "sync_state.json")
+        self.load_sync_state()
 
         setattr(ChatSync.send_message, "plugin_uuid", UUID)
         setattr(ChatSync.ingoing_message_handler, "plugin_uuid", UUID)
@@ -283,6 +287,34 @@ class ChatSync:
         with open(os.path.join(PLUGIN_FOLDER, "bots.json"), "w", encoding="utf-8") as f:
             data = [i.token for i in self.bots]
             f.write(json.dumps(data, ensure_ascii=False))
+
+    def load_sync_state(self):
+        """
+        Загружает состояние синхронизации после перезапуска.
+        """
+        try:
+            if os.path.exists(self.sync_state_file):
+                with open(self.sync_state_file, "r", encoding="utf-8") as f:
+                    state = json.loads(f.read())
+                    self.init_chat_synced = state.get("init_synced", False)
+                    logger.info(f"{LOGGER_PREFIX} Загрузил состояние синхронизации. init_chat_synced={self.init_chat_synced}")
+        except Exception as e:
+            logger.warning(f"{LOGGER_PREFIX} Ошибка при загрузке состояния синхронизации: {e}")
+            self.init_chat_synced = False
+
+    def save_sync_state(self):
+        """
+        Сохраняет состояние синхронизации для восстановления после перезапуска.
+        """
+        try:
+            if not os.path.exists(PLUGIN_FOLDER):
+                os.makedirs(PLUGIN_FOLDER)
+            with open(self.sync_state_file, "w", encoding="utf-8") as f:
+                state = {"init_synced": self.init_chat_synced}
+                f.write(json.dumps(state))
+                logger.debug(f"{LOGGER_PREFIX} Сохранил состояние синхронизации. init_chat_synced={self.init_chat_synced}")
+        except Exception as e:
+            logger.error(f"{LOGGER_PREFIX} Ошибка при сохранении состояния синхронизации: {e}")
 
     def swap_curr_bot(self):
         """
@@ -699,6 +731,7 @@ class ChatSync:
         if self.init_chat_synced or not self.ready:
             return
         self.init_chat_synced = True
+        self.save_sync_state()
         Thread(target=self.sync_chat_on_start, args=(c,), daemon=True).start()
 
     # TELEGRAM
@@ -839,6 +872,8 @@ class ChatSync:
         self.threads = {}
         self.__reversed_threads = {}
         self.save_threads()
+        self.init_chat_synced = False
+        self.save_sync_state()
         if not self.ready and self.current_bot and len(self.bots) >= MIN_BOTS and not self.cardinal.old_mode_enabled:
             self.ready = True
         self.tgbot.send_message(m.chat.id, "✅ Группа для синхронизации FunPay чатов установлена!")
@@ -854,6 +889,8 @@ class ChatSync:
         self.threads = {}
         self.__reversed_threads = {}
         self.save_threads()
+        self.init_chat_synced = False
+        self.save_sync_state()
         if not self.ready and self.current_bot and len(self.bots) >= MIN_BOTS and not self.cardinal.old_mode_enabled:
             self.ready = True
         self.tgbot.edit_message_text("✅ Группа для синхронизации FunPay чатов установлена!",
@@ -873,6 +910,8 @@ class ChatSync:
         self.threads = {}
         self.__reversed_threads = {}
         self.save_threads()
+        self.init_chat_synced = False
+        self.save_sync_state()
         self.ready = False
         self.tgbot.edit_message_text("✅ Группа для синхронизации FunPay чатов отвязана.",
                                      c.message.chat.id, c.message.id)
